@@ -49,9 +49,9 @@ internal class CryptoWrapper(context: Context, auth: Pair<String, String>, shoul
         return result
     }
 
-    internal fun get(key: String, default: Any): String {
-        val encryptedString = reader.getString(crypto.encrypt(key), crypto.encrypt(default.toString()))
-        return crypto.decrypt(encryptedString!!)
+    internal fun get(key: String, default: Any?): String? {
+        val encryptedString = reader.getString(crypto.encrypt(key), default?.let{ crypto.encrypt(default.toString()) })
+        return encryptedString?.let(crypto::decrypt)
     }
 
 
@@ -68,7 +68,7 @@ internal class CryptoWrapper(context: Context, auth: Pair<String, String>, shoul
     }
 
     internal fun remove(key: String) {
-        writer.remove(key).apply()
+        writer.remove(crypto.encrypt(key)).apply()
     }
 
     internal fun erase() {

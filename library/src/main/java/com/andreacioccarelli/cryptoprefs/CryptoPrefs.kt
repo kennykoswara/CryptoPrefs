@@ -53,21 +53,13 @@ public class CryptoPrefs(context: Context, fileName: String, key: String, should
      *                exists in the file
      * */
     @Suppress("UNCHECKED_CAST", "IMPLICIT_CAST_TO_ANY")
-    public fun <T : Any> get(key: String, default: T) = when (default::class) {
-        String::class -> preferences.get(key, default)
-        Boolean::class -> preferences.get(key, default).toBoolean()
-        Int::class -> preferences.get(key, default).toInt()
-        Float::class -> preferences.get(key, default).toFloat()
-        Long::class -> preferences.get(key, default).toLong()
-        Double::class -> preferences.get(key, default).toDouble()
-        Short::class -> preferences.get(key, default).toShort()
-        Byte::class -> preferences.get(key, default).toByte()
-        UInt::class -> preferences.get(key, default).toUInt()
-        ULong::class -> preferences.get(key, default).toULong()
-        UShort::class -> preferences.get(key, default).toUShort()
-        UByte::class -> preferences.get(key, default).toUByte()
-        else -> throw IllegalStateException("Cannot cast value found in [$key] -> [${preferences.get(key, default)}] to [${default::class}]. Create your own extension function to parse it properly")
-    } as T
+    fun get(key: String, default: Int): Int = preferences.get(key, null)?.toInt() ?: default
+    fun get(key: String, default: Long): Long = preferences.get(key, null)?.toLong() ?: default
+    fun get(key: String, default: String): String = preferences.get(key, null) ?: default
+    fun get(key: String, default: Float): Float = preferences.get(key, null)?.toFloat() ?: default
+    fun get(key: String, default: Double): Double = preferences.get(key, null)?.toDouble() ?: default
+    fun get(key: String, default: Short): Short = preferences.get(key, null)?.toShort() ?: default
+    fun get(key: String, default: Byte): Byte = preferences.get(key, null)?.toByte() ?: default
 
 
     /**
