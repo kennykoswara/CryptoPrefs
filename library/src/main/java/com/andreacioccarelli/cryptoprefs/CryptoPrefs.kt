@@ -55,11 +55,11 @@ public class CryptoPrefs(context: Context, fileName: String, key: String, should
     @Suppress("UNCHECKED_CAST", "IMPLICIT_CAST_TO_ANY")
     fun get(key: String, default: Int): Int = preferences.get(key, null)?.toInt() ?: default
     fun get(key: String, default: Long): Long = preferences.get(key, null)?.toLong() ?: default
-    fun get(key: String, default: String): String = preferences.get(key, null) ?: default
     fun get(key: String, default: Float): Float = preferences.get(key, null)?.toFloat() ?: default
     fun get(key: String, default: Double): Double = preferences.get(key, null)?.toDouble() ?: default
     fun get(key: String, default: Short): Short = preferences.get(key, null)?.toShort() ?: default
     fun get(key: String, default: Byte): Byte = preferences.get(key, null)?.toByte() ?: default
+    fun get(key: String, default: String?): String? = preferences.get(key, null) ?: default
 
 
     /**
