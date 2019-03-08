@@ -59,6 +59,7 @@ public class CryptoPrefs(context: Context, fileName: String, key: String, should
     fun get(key: String, default: Double): Double = preferences.get(key, null)?.toDouble() ?: default
     fun get(key: String, default: Short): Short = preferences.get(key, null)?.toShort() ?: default
     fun get(key: String, default: Byte): Byte = preferences.get(key, null)?.toByte() ?: default
+    fun get(key: String, default: Boolean): Boolean = preferences.get(key, null)?.toBoolean() ?: default
     fun get(key: String, default: String?): String? = preferences.get(key, null) ?: default
 
 
