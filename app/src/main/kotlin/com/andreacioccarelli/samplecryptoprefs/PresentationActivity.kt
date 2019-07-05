@@ -9,41 +9,38 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import com.andreacioccarelli.cryptoprefs.CryptoPrefs
 import kotlinx.android.synthetic.main.activity_presentation.*
 import kotlinx.android.synthetic.main.content_presentation.*
 import org.json.JSONObject
 import java.util.*
 
-
 /**
  * Presentation containing the most useful approaches to the library
  * */
-class PresentationActivity : AppCompatActivity() {
 
-    private lateinit var prefs: CryptoPrefs
+open class PresentationActivity : AppCompatActivity() {
 
+    private val prefs by lazy { CryptoPrefs(applicationContext, Keys.System.filename, Keys.System.key) }
+
+    @SuppressLint("LogConditional")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_presentation)
         setSupportActionBar(toolbar)
 
-        prefs = CryptoPrefs(applicationContext, Keys.System.filename, Keys.System.key)
         prefs.put(Keys.startCount, prefs.get(Keys.startCount, 0) + 1)
 
         button.setOnClickListener {
             // Put some sample values to the preferences
-
-            for (i in 0..1_000) {
+            for (i in 0..100) {
                 prefs.put(UUID.randomUUID().toString(), UUID.randomUUID().toString())
             }
 
-            for (i in 0..1_000) {
+            for (i in 0..100) {
                 prefs.get(UUID.randomUUID().toString(), UUID.randomUUID().toString())
             }
 
-            // You don't have to cast them before passing as arguments
             updateView()
         }
 
@@ -62,47 +59,40 @@ class PresentationActivity : AppCompatActivity() {
             prefs.put(key, jsonErrorLog)
             val jsonFromPrefs = JSONObject(prefs.get(key, ""))
 
-            toast(jsonFromPrefs.getString("details"))
-
             updateView()
         }
 
 
         button3.setOnClickListener {
-            // Function that will return back the number of times the app has started
-            toast(prefs.get(Keys.startCount, 0))
+            prefs.put("A", "B")
+            updateView()
         }
 
         button4.setOnClickListener {
-            // Example for enqueuing
-            for (i in 1..10) {
-                prefs.queue("index[$i]", i)
+            for (i in 1..100) {
+                prefs.enqueue("index[$i]", i)
             }
 
-            // Calling apply() to commit changes
             prefs.apply()
 
-
-            for (pref in prefs.allPrefsMap) {
+            for (pref in prefs.getAll()) {
                 Log.d(this.javaClass.name, "${pref.key}: ${pref.value}")
             }
-
 
             updateView()
         }
 
         button5.setOnClickListener {
-            // Reading raw file to check the values are encrypted
             var x = ""
             for (pref in getSharedPreferences(Keys.System.filename, Context.MODE_PRIVATE).all) {
                 x += "${pref.key} ${pref.value}\n"
             }
 
-            toast(x)
+            prefs.remove("A")
+            updateView()
         }
 
         button6.setOnClickListener {
-            // Clear all preferences
             prefs.erase()
             updateView()
         }
@@ -112,23 +102,18 @@ class PresentationActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateView() {
-        content.text = "*CryptoPrefs view*\n\n"
+        content.text = "[CryptoPrefs view]\n\n"
 
-        for (pref in prefs.allPrefsMap) {
+        for (pref in prefs.getAll()) {
             content.text = "${content.text}key ${pref.key}, value=${pref.value};\n"
         }
 
-
-        content.text = "${content.text}\n\n\n*Shared Prefs view*\n\n"
+        content.text = "${content.text}\n\n\n[Shared Prefs view]\n\n"
         for (pref in getSharedPreferences(Keys.System.filename, Context.MODE_PRIVATE).all) {
             content.text = "${content.text}key \"${pref.key}\", value=\"${pref.value}\";\n"
         }
 
         content.text = "${content.text}\n\n\n"
-    }
-
-    private fun Context.toast(message: Any) {
-        Toast.makeText(applicationContext, message.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -146,15 +131,14 @@ class PresentationActivity : AppCompatActivity() {
         }
     }
 
-    protected fun randomString(): String {
-        val SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz<>-@"
+    protected fun randomString(length: Int = 18): String {
+        val saltChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz<>-@/"
         val salt = StringBuilder()
         val rnd = Random()
-        while (salt.length < 18) { // length of the random string.
-            val index = (rnd.nextFloat() * SALTCHARS.length) as Int
-            salt.append(SALTCHARS[index])
+        while (salt.length < length) {
+            val index = (rnd.nextFloat() * saltChars.length).toInt()
+            salt.append(saltChars[index])
         }
         return salt.toString()
-
     }
 }
